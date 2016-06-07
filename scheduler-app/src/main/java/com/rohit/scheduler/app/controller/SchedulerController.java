@@ -1,6 +1,7 @@
 package com.rohit.scheduler.app.controller;
 
 import com.rohit.scheduler.app.jobs.HttpCallbackJob;
+import com.rohit.scheduler.app.models.request.CreateHttpJobRequest;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,33 +21,25 @@ public class SchedulerController {
     @Autowired
     Scheduler scheduler;
 
-    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    @RequestMapping(value = "/addJob", method = RequestMethod.POST)
     @ResponseBody
-    public void addJob() {
+    public void addJob(@RequestBody CreateHttpJobRequest createHttpJobRequest) throws SchedulerException {
         logger.info("Scheduling a job");
 
         JobDetail jobDetail = newJob(HttpCallbackJob.class)
-                .withIdentity("myjob", "group1").build();
+                .withIdentity(createHttpJobRequest.getJobName(), createHttpJobRequest.getJobGroup()).build();
 
         Trigger trigger = newTrigger()
                 .withIdentity("mytrigger", "group1")
                 .startNow()
                 .withSchedule(simpleSchedule().withIntervalInSeconds(30).repeatForever()).build();
 
-        try {
-            scheduler.scheduleJob(jobDetail,trigger);
-        } catch (SchedulerException e) {
-            logger.error("Error while trrying to schedule a job", e);
-        }
+        scheduler.scheduleJob(jobDetail, trigger);
     }
 
-    @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/deleteJob", method = RequestMethod.DELETE)
     @ResponseBody
-    public void deleteJob(@RequestParam String name, @RequestParam  String group) {
-        try {
-            scheduler.deleteJob(new JobKey(name, group));
-        } catch (SchedulerException e) {
-            logger.error("Error while trying to delete");
-        }
+    public void deleteJob(@RequestParam String name, @RequestParam String group) throws SchedulerException {
+        scheduler.deleteJob(new JobKey(name, group));
     }
 }
