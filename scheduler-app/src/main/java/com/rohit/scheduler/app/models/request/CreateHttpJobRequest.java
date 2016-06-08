@@ -1,8 +1,10 @@
 package com.rohit.scheduler.app.models.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.rohit.scheduler.app.models.Trigger;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.Valid;
 import java.io.Serializable;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -12,10 +14,18 @@ public class CreateHttpJobRequest implements Serializable {
     String jobName;
 
     @NotBlank
-    String jobGroup;
-
     String httpCallBackUrl;
 
+    @Valid
+    Trigger trigger;
+
+    public Trigger getTrigger() {
+        return trigger;
+    }
+
+    public void setTrigger(Trigger trigger) {
+        this.trigger = trigger;
+    }
 
     public String getJobName() {
         return jobName;
@@ -23,14 +33,6 @@ public class CreateHttpJobRequest implements Serializable {
 
     public void setJobName(String jobName) {
         this.jobName = jobName;
-    }
-
-    public String getJobGroup() {
-        return jobGroup;
-    }
-
-    public void setJobGroup(String jobGroup) {
-        this.jobGroup = jobGroup;
     }
 
     public String getHttpCallBackUrl() {
